@@ -10,18 +10,19 @@ let Storyblok = new StoryblokClient({
   oauthToken: "sB95UP70Oko4MDQCSKb79gtt-112653-eSzMek4_t7nc5zvDm7VZ",
 });
 
-const data = ["fields id,title,slug,content,author,date,cat,status;"];
+const data = ["fields id,slug,title,description,role,duration,content,date,size,link,code,orderID;", "sort orderID desc;"];
 let blogPosts = [];
 await axios
-  .post("https://admin.sebbejohansson.com/api/blogs/get", data.join(""))
+  .post("https://admin.sebbejohansson.com/api/portfolios/get", data.join(""))
   .then((response) => {
     //console.log(response.data);
+    console.log(response.data);
     blogPosts = response.data;
   })
   .catch((error) => {
     console.log(error.response);
   });
-
+//blogPosts = blogPosts.slice(0,1);
 blogPosts.forEach((post) => {
   const blogPost = post;
 
@@ -37,18 +38,33 @@ blogPosts.forEach((post) => {
       name: blogPost.title,
       slug: blogPost.slug,
       content: {
-        component: "blog-entry",
+        component: "portfolio-entry",
         content: [
           {
             component: "text",
             text: richtextData,
           },
         ],
-        date: blogPost.date,
+        role: blogPost.role,
+        duration: blogPost.duration,
+        description: blogPost.description,
+        size: blogPost.size === 1 ? "small" : "big",
+        link: {
+          "id": "",
+          "url": blogPost.link,
+          "linktype": "url",
+          "cached_url": blogPost.link
+        },
+        code: {
+          "id": "",
+          "url": blogPost.code,
+          "linktype": "url",
+          "cached_url": blogPost.code
+        },
       },
       first_published_at: blogPost.date,
     },
-    publish: blogPost.status,
+    publish: 1,
   })
     .then((response) => {
       // console.log(response)
